@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sınıf Kitaplığı Takip Sistemi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-5">
+    <div class="max-w-5xl mx-auto">
+        <header class="bg-blue-600 text-white p-6 rounded-lg shadow-lg mb-6">
+            <h1 class="text-3xl font-bold">📚 Sınıf Kütüphane Paneli</h1>
+            <p class="opacity-80">Öğrenci okuma takiplerini buradan yönetin.</p>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white p-6 rounded-lg shadow-md h-fit">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">Yeni Kitap Teslim Et</h2>
+                <div class="space-y-4">
+                    <input type="text" id="studentName" placeholder="Öğrenci Adı" class="w-full p-2 border rounded">
+                    <input type="text" id="bookName" placeholder="Kitap Adı" class="w-full p-2 border rounded">
+                    <button onclick="addEntry()" class="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600 transition">Listeye Ekle</button>
+                </div>
+            </div>
+
+            <div class="md:col-span-2 bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">Güncel Okuma Listesi</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-50">
+                                <th class="p-3 border-b">Öğrenci</th>
+                                <th class="p-3 border-b">Kitap</th>
+                                <th class="p-3 border-b">Tarih</th>
+                                <th class="p-3 border-b">İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let readings = JSON.parse(localStorage.getItem('libraryData')) || [];
+
+        function addEntry() {
+            const student = document.getElementById('studentName').value;
+            const book = document.getElementById('bookName').value;
+            const date = new Date().toLocaleDateString('tr-TR');
+
+            if(student && book) {
+                readings.push({ student, book, date });
+                localStorage.setItem('libraryData', JSON.stringify(readings));
+                renderTable();
+                document.getElementById('studentName').value = '';
+                document.getElementById('bookName').value = '';
+            } else {
+                alert("Lütfen tüm alanları doldurun!");
+            }
+        }
+
+        function deleteEntry(index) {
+            readings.splice(index, 1);
+            localStorage.setItem('libraryData', JSON.stringify(readings));
+            renderTable();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            readings.forEach((item, index) => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-3 border-b font-medium">${item.student}</td>
+                        <td class="p-3 border-b">${item.book}</td>
+                        <td class="p-3 border-b text-sm text-gray-500">${item.date}</td>
+                        <td class="p-3 border-b">
+                            <button onclick="deleteEntry(${index})" class="text-red-500 hover:underline">Teslim Alındı</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        renderTable();
+    </script>
+</body>
+</html> 
